@@ -1,5 +1,5 @@
 // this lexer only supports ASCII characters
-// the purpose of a lexer is to convert user written into tokens
+// the purpose of a lexer is to convert user written skibidi code into tokens
 package lexer
 
 import "skibidi/token"
