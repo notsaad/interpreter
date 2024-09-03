@@ -2,7 +2,7 @@ package token
 
 const (
     ILLEGAL = "ILLEGAL"
-    EOF     = "EOF"
+    EOF     = ""
 
     // identifiers and literals
     IDENT   = "IDENT"
@@ -31,7 +31,7 @@ type TokenType string
 
 type Token struct {
     // used to distinguish between things like integer or brackets, etc
-    type    TokenType
+    Type    TokenType
     // holds the literal value of the token (ex 5, 10, etc)
     Literal string
 }

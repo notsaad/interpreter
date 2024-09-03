@@ -19,15 +19,15 @@ func TestNextToken(t *testing.T) {
         expectedType    token.TokenType
         expectedLiteral string
     }{
-        {token.ASSIGN, "="}
-        {token.PLUS, "+"}
-        {token.LPAREN, "("}
-        {token.RPAREN, ")"}
-        {token.LBRACE, "{"}
-        {token.RBRACE, "}"}
-        {token.COMMA, ","}
-        {token.SEMICOLON, ";"}
-        {token.EOF, ""}
+        {token.ASSIGN, "="},
+        {token.PLUS, "+"},
+        {token.LPAREN, "("},
+        {token.RPAREN, ")"},
+        {token.LBRACE, "{"},
+        {token.RBRACE, "}"},
+        {token.COMMA, ","},
+        {token.SEMICOLON, ";"},
+        {token.EOF, ""},
     }
 
     l := New(input)
@@ -35,7 +35,7 @@ func TestNextToken(t *testing.T) {
     for i, tt := range tests {
         tok := l.NextToken()
 
-        if tok.Type != tt.expected {
+        if tok.Type != tt.expectedType {
             // like throwing an exception (Fatalf)
             t.Fatalf("tests[%d] - token type wrong. expected: %q, got: %q", i, tt.expectedType, tok.Type)
         }
