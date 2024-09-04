@@ -36,4 +36,18 @@ type Token struct {
     Literal string
 }
 
+var keywords = map[string]TokenType{
+    "fn": FUNCTION,
+    "let": LET,
+}
+
+// checks the keywords table to see if the identifier is a known keyword (like var)
+// if it isn't then it returns token.IDENT, signifying that it is a custom user identifier
+func LookupIdent(ident string) TokenType {
+    if tok, ok := keywords[ident]; ok {
+        return tok
+    }
+    return IDENT
+}
+
 
