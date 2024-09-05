@@ -25,23 +25,32 @@ func (l *Lexer) NextToken() token.Token {
     switch l.ch{
     case '=':
         tok = newToken(token.ASSIGN, l.ch)
+        l.readChar()
     case ';':
         tok = newToken(token.SEMICOLON, l.ch)
+        l.readChar()
     case '(':
         tok = newToken(token.LPAREN, l.ch)
+        l.readChar()
     case ')':
         tok = newToken(token.RPAREN, l.ch)
+        l.readChar()
     case '{':
         tok = newToken(token.LBRACE, l.ch)
+        l.readChar()
     case '}':
         tok = newToken(token.RBRACE, l.ch)
+        l.readChar()
     case ',':
         tok = newToken(token.COMMA, l.ch)
+        l.readChar()
     case '+':
         tok = newToken(token.PLUS, l.ch)
-    case '0':
+        l.readChar()
+    case 0:
         tok.Literal = ""
         tok.Type = token.EOF
+        l.readChar()
     // default case in case the token is not recoginzed
     // used mainly to determine if the irregular input is a known keyword of the language
     // or if it is a custom identifier made by the user
@@ -50,7 +59,6 @@ func (l *Lexer) NextToken() token.Token {
             tok.Literal = l.readIdentifier()
             tok.Type = token.LookupIdent(tok.Literal)
             return tok
-            
         } else if isDigit(l.ch){
             // should read the entirety of the number and assign it
             tok.Literal = l.readDigits()
@@ -60,10 +68,8 @@ func (l *Lexer) NextToken() token.Token {
         }
     }
 
-    l.readChar()
     return tok
 }
-
 
 
 // found in a lot of parsers, sometimes is called eatWhitespace / consumeWhitespace
@@ -96,7 +102,7 @@ func isLetter(ch byte) bool {
 }
 
 func isDigit(ch byte) bool {
-    return ('0' <= ch && ch <= '9')
+    return '0' <= ch && ch <= '9'
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
