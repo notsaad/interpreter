@@ -24,7 +24,13 @@ func (l *Lexer) NextToken() token.Token {
 
     switch l.ch{
     case '=':
-        tok = newToken(token.ASSIGN, l.ch)
+        if l.peekChar() == '=' {
+            ch := l.ch
+            l.readChar()
+            tok = token.Token{Type: token.EQ, Literal: string(ch) + string(l.ch)}
+        } else {
+            tok = newToken(token.ASSIGN, l.ch)
+        }
         l.readChar()
     case ';':
         tok = newToken(token.SEMICOLON, l.ch)
@@ -46,6 +52,30 @@ func (l *Lexer) NextToken() token.Token {
         l.readChar()
     case '+':
         tok = newToken(token.PLUS, l.ch)
+        l.readChar()
+    case '-':
+        tok = newToken(token.MINUS, l.ch)
+        l.readChar()
+    case '!':
+        if l.peekChar() == '=' {
+            ch := l.ch
+            l.readChar()
+            tok = token.Token{Type: token.NOT_EQ, Literal: string(ch) + string(l.ch)}
+        } else {
+            tok = token.Token{Type: token.BANG, Literal: string(l.ch)}
+        }
+        l.readChar()
+    case '/':
+        tok = newToken(token.SLASH, l.ch)
+        l.readChar()
+    case '*':
+        tok = newToken(token.ASTERISK, l.ch)
+        l.readChar()
+    case '<':
+        tok = newToken(token.LT, l.ch)
+        l.readChar()
+    case '>':
+        tok = newToken(token.GT, l.ch)
         l.readChar()
     case 0:
         tok.Literal = ""
@@ -71,6 +101,13 @@ func (l *Lexer) NextToken() token.Token {
     return tok
 }
 
+func (l *Lexer) peekChar() byte {
+    if l.readPosition >= len(l.input){
+        return 0
+    } else {
+        return l.input[l.readPosition]
+    }
+}
 
 // found in a lot of parsers, sometimes is called eatWhitespace / consumeWhitespace
 func (l *Lexer) skipWhitespace() {
