@@ -2,15 +2,15 @@
 package parser
 
 import (
-    "monkey/ast"
-    "monkey/lexer"
-    "monkey/token"
+    "skibidi/ast"
+    "skibidi/lexer"
+    "skibidi/token"
 )
 
 type Parser struct {
     l           *lexer.Lexer // a pointer to an instance of the lexer (where we call nextToken())
     curToken    token.Token // these two act like two 'pointers' to the curr and upcoming tokens
-    peekToken   token.Toke
+    peekToken   token.Token
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -29,5 +29,26 @@ func (p *Parser) nextToken() {
 }
 
 func (p *Parser) ParseProgram() *ast.Program {
-    return nil
+    program := &ast.Program{}
+    program.Statements = []ast.Statement{}
+
+    for p.curToken.Type != token.EOF {
+        stmt := p.parseStatement()
+        if stmt != nil {
+            program.Statements = append(program.Statements, stmt)
+        }
+        p.nextToken()
+    }
+    return program
 }
+
+func (p *Parser) parseStatement() ast.Statement {
+    switch p.curToken.Type {
+    case token.LET:
+        return p.parseLetStatement()
+    default:
+        return nil
+    }
+}
+
+func (p *Parser) parseLetStatement

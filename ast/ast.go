@@ -2,6 +2,10 @@ package ast
 
 // ast -> abstract syntax tree (abstract because some syntax like semicolons or brackets may be left out)
 
+import (
+    "skibidi/token"
+)
+
 type Node interface {
     TokenLiteral() string
 }
