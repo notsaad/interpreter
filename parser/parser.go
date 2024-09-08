@@ -11,10 +11,14 @@ type Parser struct {
     l           *lexer.Lexer // a pointer to an instance of the lexer (where we call nextToken())
     curToken    token.Token // these two act like two 'pointers' to the curr and upcoming tokens
     peekToken   token.Token
+    errors []string
 }
 
 func New(l *lexer.Lexer) *Parser {
-    p := &Parser{l: l}
+    p := &Parser{
+        l: l,
+        errors: []string{},
+    }
 
     // read two tokens, so curToken and peekToken are both set
     p.nextToken()
@@ -26,6 +30,15 @@ func New(l *lexer.Lexer) *Parser {
 func (p *Parser) nextToken() {
     p.curToken = p.peekToken
     p.peekToken = p.l.NextToken()
+}
+
+func (p *Parser) Errors() []string {
+    return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+    msg := fmt.Sprintf("expected next token to be %s, got: %s", t, p.peekToken.Type)
+    p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) ParseProgram() *ast.Program {
