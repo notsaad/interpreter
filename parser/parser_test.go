@@ -17,6 +17,7 @@ func TestLetStatements(t *testing.T) {
     p := New(l)
 
     program := p.ParseProgram()
+    checkParserErrors(t, p)
     if program == nil {
         t.Fatalf("ParseProgram() returned nil")
     }
@@ -40,11 +41,27 @@ func TestLetStatements(t *testing.T) {
     }
 }
 
+func checkParserErrors(t *testing.T, p *Parser) {
+    errors := p.Errors()
+    if len(errors) == 0 {
+        return
+    }
+
+    t.Errorf("parser has %d errors", len(errors))
+    for _, msg := range errors {
+        t.Errorf("Parser Error: %q", msg)
+    }
+    // .FailNow() is used in the native testing package of Go, and it marks the function as having failed and stops its execution
+    t.FailNow()
+
+}
+
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
     if s.TokenLiteral() != "let" {
         t.Errorf("s.TokenLiteral not 'let', got: %q", s.TokenLiteral())
         return false
     }
+
 
     letStmt, ok := s.(*ast.LetStatement)
 

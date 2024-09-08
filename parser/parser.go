@@ -5,6 +5,7 @@ import (
     "skibidi/ast"
     "skibidi/lexer"
     "skibidi/token"
+    "fmt"
 )
 
 type Parser struct {
@@ -36,6 +37,7 @@ func (p *Parser) Errors() []string {
     return p.errors
 }
 
+// works with the expectPeek function to make debugging easier in cases of errors
 func (p *Parser) peekError(t token.TokenType) {
     msg := fmt.Sprintf("expected next token to be %s, got: %s", t, p.peekToken.Type)
     p.errors = append(p.errors, msg)
@@ -45,7 +47,7 @@ func (p *Parser) ParseProgram() *ast.Program {
     program := &ast.Program{}
     program.Statements = []ast.Statement{}
 
-    for p.curToken.Type != token.EOF {
+    for !p.curTokenIs(token.EOF){
         stmt := p.parseStatement()
         if stmt != nil {
             program.Statements = append(program.Statements, stmt)
@@ -94,11 +96,15 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
     return p.peekToken.Type == t
 }
 
+// this is an assertion function that is common among all types of parsers
+// primary purpose is to enforce the correctness of the order of tokens by checking the type of the next token
+// it checks the type of the next token and if it is the expected type, only then does it advance the tokens via a nextToken call
 func (p *Parser) expectPeek(t token.TokenType) bool {
     if p.peekTokenIs(t) {
         p.nextToken()
         return true
     } else {
+        p.peekError(t)
         return false
     }
 }
