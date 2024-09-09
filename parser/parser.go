@@ -11,6 +11,19 @@ import (
     "fmt"
 )
 
+// the precedences in the Skibidi programming language
+const (
+    // iota gives numbers to these values (think enum in c)
+    _ int = iota
+    LOWEST
+    EQUALS
+    LESSGREATER
+    SUM
+    PRODUCT
+    PREFIX
+    CALL
+)
+
 // seperate into prefix and infix operators because they are treated completely differently
 // postfix operators are not supported in skibidi purely for simplicity sake
 type (
@@ -42,11 +55,21 @@ func New(l *lexer.Lexer) *Parser {
         errors: []string{},
     }
 
+    p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+    p.registerPrefix(token.IDENT, p.parseIdentifier)
+
     // read two tokens, so curToken and peekToken are both set
     p.nextToken()
     p.nextToken()
 
     return p
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+    return &ast.Identifier {
+        Token: p.curToken,
+        Value: p.curToken.Literal,
+    }
 }
 
 func (p *Parser) nextToken() {
@@ -85,8 +108,36 @@ func (p *Parser) parseStatement() ast.Statement {
     case token.RETURN:
         return p.parseReturnStatement()
     default:
+        return p.parseExpressionStatement()
+    }
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+    stmt := &ast.ExpressionStatement {
+        Token: p.curToken,
+    }
+
+    stmt.Expression = p.parseExpression(LOWEST)
+
+    if p.peekTokenIs(token.SEMICOLON) {
+        p.nextToken()
+    }
+    return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+    // checks if we have a parsing function set up for the current token type
+    prefix := p.prefixParseFns[p.curToken.Type]
+
+    if prefix == nil {
         return nil
     }
+    
+    // if there is a parsing function associated with the current token type in the prefix position
+    leftExp := prefix()
+    
+    return leftExp
+
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
