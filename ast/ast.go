@@ -39,8 +39,22 @@ type LetStatement struct {
     Value   Expression
 }
 
-func (ls *LetStatement) statementNode()         {}
-func (ls *LetStatement) TokenLiteral() string   { return ls.Token.Literal }
+type ReturnStatement struct {
+    Token       token.Token // the 'return' toen
+    ReturnValue Expression // contains the expression that is to be returned
+}
+
+func (rs *ReturnStatement) statementNode() {}
+
+func (rs *ReturnStatement) TokenLiteral() string {
+    return rs.Token.Literal
+}
+
+func (ls *LetStatement) statementNode() {}
+
+func (ls *LetStatement) TokenLiteral() string {
+    return ls.Token.Literal
+}
 
 // holds the identifier of the binding (x in 'let x = 5;')
 type Identifier struct {

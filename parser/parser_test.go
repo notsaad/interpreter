@@ -4,6 +4,7 @@ import (
     "testing"
     "skibidi/ast"
     "skibidi/lexer"
+    "fmt"
 )
 
 func TestLetStatements(t *testing.T) {
@@ -39,6 +40,36 @@ func TestLetStatements(t *testing.T) {
             return
         }
     }
+}
+
+func TestReturnStatements(t *testing.T) {
+    input := `
+    return 5;
+    return 10;
+    return 696969;
+    `
+    
+    l := lexer.New(input)
+    p := New(l)
+
+    program := p.ParseProgram()
+    checkParserErrors(t, p)
+    if len(program.Statements) != 3 {
+        t.Fatalf("Expected 3 statements for program.Statements, got: %d", len(program.Statements))
+    }
+
+    for _, stmt := range program.Statements {
+        fmt.Print(stmt)
+        returnStmt, ok := stmt.(*ast.ReturnStatement)
+        if !ok {
+            t.Errorf("stmt not *ast.returnStatement, got: %T", stmt)
+            continue
+        }
+        if returnStmt.TokenLiteral() != "return" {
+            t.Errorf("Expected returnStmt.TokenLiteral() to be return, got: %q", returnStmt.TokenLiteral())
+        }
+    }
+
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {
