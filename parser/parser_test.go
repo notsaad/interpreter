@@ -4,8 +4,40 @@ import (
     "testing"
     "skibidi/ast"
     "skibidi/lexer"
-    "fmt"
+//    "fmt"
 )
+
+func TestIdentifierExpression(t *testing.T) {
+    input := "foobar;"
+
+    l := lexer.New(input)
+    p := New(l)
+    program := p.ParseProgram()
+    checkParserErrors(t, p)
+
+    if len(program.Statements) != 1 {
+        t.Fatalf("Expected 1 Program Statement, got: %d", len(program.Statements))
+    }
+
+    stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+    if !ok {
+        t.Fatalf("Program.Statements[0] is not ast.ExpressionStatement, got: %T", program.Statements[0])
+    }
+
+    ident, ok := stmt.Expression.(*ast.Identifier)
+    if !ok {
+        t.Fatalf("Expression not *ast.Identifier, got: %T", stmt.Expression)
+    }
+
+    if ident.Value != "foobar" {
+        t.Errorf("ident.Value not %s, got: %s", "foobar", ident.Value)
+    }
+
+    if ident.TokenLiteral() != "foobar" {
+        t.Errorf("ident.TokenLiteral not %s, got: %s", "foobar", ident.TokenLiteral())
+    }
+
+}
 
 func TestLetStatements(t *testing.T) {
     input := `
@@ -59,7 +91,7 @@ func TestReturnStatements(t *testing.T) {
     }
 
     for _, stmt := range program.Statements {
-        fmt.Print(stmt)
+        //fmt.Print(stmt)
         returnStmt, ok := stmt.(*ast.ReturnStatement)
         if !ok {
             t.Errorf("stmt not *ast.returnStatement, got: %T", stmt)

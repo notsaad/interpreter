@@ -11,11 +11,29 @@ import (
     "fmt"
 )
 
+// seperate into prefix and infix operators because they are treated completely differently
+// postfix operators are not supported in skibidi purely for simplicity sake
+type (
+    prefixParseFn   func() ast.Expression
+    infixParseFn    func(ast.Expression) ast.Expression
+)
+
 type Parser struct {
     l           *lexer.Lexer // a pointer to an instance of the lexer (where we call nextToken())
     curToken    token.Token // these two act like two 'pointers' to the curr and upcoming tokens
     peekToken   token.Token
     errors []string
+
+    prefixParseFns  map[token.TokenType]prefixParseFn
+    infixParseFns  map[token.TokenType]infixParseFn
+}
+
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+    p.prefixParseFns[tokenType] = fn
+}
+
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+    p.infixParseFns[tokenType] = fn
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -130,3 +148,5 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
         return false
     }
 }
+
+

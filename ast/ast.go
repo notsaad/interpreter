@@ -4,6 +4,7 @@ package ast
 
 import (
     "skibidi/token"
+    "bytes"
 )
 
 type Node interface {
@@ -46,7 +47,7 @@ func (p *Program) TokenLiteral() string {
 
 type ExpressionStatement struct {
     Token       token.Token // the first token of the expression
-    Expression  expression
+    Expression  Expression
 }
 
 type LetStatement struct {
