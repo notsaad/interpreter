@@ -9,6 +9,7 @@ import (
     "skibidi/lexer"
     "skibidi/token"
     "fmt"
+    "strconv"
 )
 
 // the precedences in the Skibidi programming language
@@ -57,6 +58,7 @@ func New(l *lexer.Lexer) *Parser {
 
     p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
     p.registerPrefix(token.IDENT, p.parseIdentifier)
+    p.registerPrefix(token.INT, p.parseIntegerLiteral)
 
     // read two tokens, so curToken and peekToken are both set
     p.nextToken()
@@ -200,4 +202,24 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
     }
 }
 
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+    lit := &ast.IntegerLiteral{
+        Token: p.curToken,
+    }
+    // first parameter is the string s
+    // second parameter is the base value of the given value (0, 2-36)
+    // third parameter is the bitSize (integer type that is returned) - 64 for int64, etc
+    value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+
+    if err != nil {
+        msg := fmt.Sprintf("Could not parse %q as integer", p.curToken.Literal)
+        p.errors = append(p.errors, msg)
+        return nil
+    }
+
+    lit.Value = value
+
+    return lit
+
+}
 

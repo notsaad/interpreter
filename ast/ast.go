@@ -32,6 +32,11 @@ type Expression interface {
     expressionNode()
 }
 
+type IntegerLiteral struct {
+    Token token.Token
+    Value int64
+}
+
 // program node is going to be the root node of every AST our parser makes
 type Program struct {
     Statements []Statement
@@ -43,6 +48,16 @@ func (p *Program) TokenLiteral() string {
     } else {
         return ""
     }
+}
+
+func (il *IntegerLiteral) expressionNode()  {}
+
+func (il *IntegerLiteral) TokenLiteral() string {
+    return il.Token.Literal
+}
+
+func (il *IntegerLiteral) String() string {
+    return il.Token.Literal
 }
 
 type ExpressionStatement struct {
