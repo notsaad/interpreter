@@ -242,6 +242,8 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 
 }
 
+// almost identical to testing prefix expressions, however this time we are concerned with the tokens to the Right AND the Left of the resulting AST node.
+// in the prefix tests we only cared about the tokens to the right of the AST node
 func TestParsingInfixExpressions(t *testing.T) {
     infixTests := []struct{
         input       string

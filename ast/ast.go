@@ -39,6 +39,13 @@ type PrefixExpression struct {
     Right       Expression // expression to the right (lol)
 }
 
+type InfixExpression struct {
+    Token       token.Token
+    Left        Expression // expression to the left (lol)
+    Operator    string
+    Right       Expression // expression to the right (lol)
+}
+
 type IntegerLiteral struct {
     Token token.Token
     Value int64
@@ -95,7 +102,7 @@ func (ls *LetStatement) String() string {
 }
 
 type ReturnStatement struct {
-    Token       token.Token // the 'return' toen
+    Token       token.Token // the 'return' token
     ReturnValue Expression // contains the expression that is to be returned
 }
 
@@ -165,6 +172,28 @@ func (pe *PrefixExpression) String() string {
     out.WriteString("(")
     out.WriteString(pe.Operator)
     out.WriteString(pe.Right.String())
+    out.WriteString(")")
+
+    return out.String()
+
+}
+
+func (ie *InfixExpression) expressionNode() {
+    
+}
+
+func (ie *InfixExpression) TokenLiteral() string {
+    return ie.Token.Literal
+}
+
+func (ie *InfixExpression) String() string {
+    var out bytes.Buffer
+
+    // adding the parentheses is so we can easily tell what actually belongs to the infix expressionNode (in the case of debugging or smt)
+    out.WriteString("(")
+    out.WriteString(ie.Left.String())
+    out.WriteString(" " + ie.Operator + " ")
+    out.WriteString(ie.Right.String())
     out.WriteString(")")
 
     return out.String()
