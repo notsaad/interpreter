@@ -33,6 +33,12 @@ type Expression interface {
     expressionNode()
 }
 
+type PrefixExpression struct {
+    Token       token.Token // the token value of the prefix expression (eg ! or -)
+    Operator    string
+    Right       Expression // expression to the right (lol)
+}
+
 type IntegerLiteral struct {
     Token token.Token
     Value int64
@@ -143,3 +149,25 @@ type Identifier struct {
 func (i *Identifier) expressionNode()           {}
 func (i *Identifier) TokenLiteral() string      { return i.Token.Literal }
 func (i *Identifier) String() string { return i.Value }
+
+func (pe *PrefixExpression) expressionNode() {
+
+}
+
+func (pe *PrefixExpression) TokenLiteral() string {
+    return pe.Token.Literal
+}
+
+func (pe *PrefixExpression) String() string {
+    var out bytes.Buffer
+
+    // adding the parentheses is so we can easily tell what actually belongs to the prefix expressionNode (in the case of debugging or smt)
+    out.WriteString("(")
+    out.WriteString(pe.Operator)
+    out.WriteString(pe.Right.String())
+    out.WriteString(")")
+
+    return out.String()
+
+}
+
