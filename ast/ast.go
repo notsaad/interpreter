@@ -23,6 +23,7 @@ func (p *Program) String() string {
 }
 
 type Statement interface {
+    // interfaces the default node interface into 
     Node
     statementNode()
 }
