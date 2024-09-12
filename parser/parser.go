@@ -62,6 +62,16 @@ func New(l *lexer.Lexer) *Parser {
     p.registerPrefix(token.BANG, p.parsePrefixExpression)
     p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
+    p.infixParseFns = make(map[token.TokenType]infixParseFn)
+    p.registerInfix(token.PLUS, p.parseInfixExpression)
+    p.registerInfix(token.MINUS, p.parseInfixExpression)
+    p.registerInfix(token.SLASH, p.parseInfixExpression)
+    p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+    p.registerInfix(token.EQ, p.parseInfixExpression)
+    p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
+    p.registerInfix(token.LT, p.parseInfixExpression)
+    p.registerInfix(token.GT, p.parseInfixExpression)
+
     // read two tokens, so curToken and peekToken are both set
     p.nextToken()
     p.nextToken()
@@ -229,6 +239,7 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
     p.errors = append(p.errors, msg)
 }
 
+// this function is the heart of the Pratt parser
 func (p *Parser) parseExpression(precedence int) ast.Expression {
     prefix := p.prefixParseFns[p.curToken.Type]
     if prefix == nil {
@@ -237,6 +248,71 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
     }
     leftExp := prefix()
 
+    // as long as the next token is not a semicolon and the next tokens precedence is not greater
+    for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
+        // by repeating iteration based on precedence, even complex expression with brackets and other items are evaluated correctly
+        // this is because it keeps going until it finds the 'middle' of the expression and evaluates outwards from there
+        infix := p.infixParseFns[p.peekToken.Type]
+        if infix == nil {
+            return leftExp
+        }
+
+        p.nextToken()
+
+        leftExp = infix(leftExp)
+
+    }    
+
     return leftExp
+}
+
+// look up table for precedences that references the previously defined const
+var precedences = map[token.TokenType] int{
+    token.EQ:       EQUALS,
+    token.NOT_EQ:   EQUALS,
+    token.LT:       LESSGREATER,
+    token.GT:       LESSGREATER,
+    token.PLUS:     SUM,
+    token.MINUS:    SUM,
+    token.SLASH:    PRODUCT,
+    token.ASTERISK: PRODUCT,
+}
+
+func (p *Parser) peekPrecedence() int {
+    // look at the precedence of the next token
+    if p, ok := precedences[p.peekToken.Type]; ok {
+        return p
+    // return lowest if not found in lookup table
+    }
+    return LOWEST
+}
+
+func (p *Parser) curPrecedence() int {
+    // precedence of cur token
+    if p, ok := precedences[p.curToken.Type]; ok {
+        return p
+    }
+    // return lowest if not found in lookup table
+    return LOWEST
+}
+
+// this parsing function takes the left expression as an argument
+// this is so it can use this argument to construct the ast node
+// (the infix expression ast node requires a left and right node)
+func (p *Parser) parseInfixExpression (left ast.Expression) ast.Expression {
+    expression := &ast.InfixExpression {
+        Token:      p.curToken,
+        Operator:   p.curToken.Literal,
+        Left:       left,
+    }
+
+    // assign the current tokens precedence to a variable
+    precedence := p.curPrecedence()
+    p.nextToken()
+    // fill the right expresison with that precedence so the evaluation occurs properly
+    expression.Right = p.parseExpression(precedence)
+
+    return expression
+
 }
 
