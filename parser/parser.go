@@ -64,6 +64,7 @@ func New(l *lexer.Lexer) *Parser {
     p.registerPrefix(token.TRUE, p.parseBoolean)
     p.registerPrefix(token.FALSE, p.parseBoolean)
     p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+    p.registerPrefix(token.IF, p.parseIfExpression)
 
     p.infixParseFns = make(map[token.TokenType]infixParseFn)
     p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -332,5 +333,37 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
         return nil
     }
     return exp
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+
+    expression := &ast.IfExpression{
+        Token: p.curToken,
+    }
+
+    // the correct syntax for an if statement is "if (" and then something else
+    // if the if statement is not followed by an opening parentheses, then abort and throw an error
+    if !p.expectPeek(token.LPAREN){
+        return nil
+    }
+
+    p.nextToken()
+    // parses the actual contents of the if statement
+    expression.Condition = p.parseExpression(LOWEST)
+
+    // if the if statement is not closed by a bracket, throw an error
+    if !p.expectPeek(token.RPAREN){
+        return nil
+    }
+
+    // { to start the logic after the if statement
+    if !p.expectPeek(token.LBRACE) {
+        return nil
+    }
+
+    expression.Consequence = p.parseBlockStatement()
+
+    return expression
+
 }
 
