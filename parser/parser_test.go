@@ -314,7 +314,7 @@ func TestParsingInfixExpressions(t *testing.T) {
     }
 }
 
-func testIntegerLiteral (t *testing.T, exp ast.Expression, expected interface{}) bool {
+func testLiteralExpression (t *testing.T, exp ast.Expression, expected interface{}) bool {
     switch v := expected.(type) {
     case int:
         return testIntegerLiteral(t, exp, int64(v))
