@@ -356,6 +356,8 @@ func (p *Parser) parseIfExpression() ast.Expression {
         return nil
     }
 
+    p.nextToken()
+
     // { to start the logic after the if statement
     if !p.expectPeek(token.LBRACE) {
         return nil
@@ -363,7 +365,35 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
     expression.Consequence = p.parseBlockStatement()
 
+    if p.peekTokenIs(token.ELSE) {
+        p.nextToken()
+
+        if !p.expectPeek(token.LBRACE) {
+            return nil
+        }
+
+        expression.Alternative = p.parseBlockStatement()
+    }
+
     return expression
 
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+    block := &ast.BlockStatement {
+        Token: p.curToken,
+    }
+
+    p.nextToken()
+
+    for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+        stmt := p.parseStatement()
+        if stmt != nil {
+            block.Statements = append(block.Statements, stmt)
+        }
+        p.nextToken()
+    }
+
+    return block
 }
 
