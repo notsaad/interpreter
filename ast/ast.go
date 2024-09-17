@@ -280,7 +280,7 @@ type FunctionLiteral struct {
     Body        *BlockStatement
 }
 
-func (fl *FunctionLiteral) statementNode() {
+func (fl *FunctionLiteral) expressionNode() {
 
 }
 
