@@ -364,8 +364,6 @@ func (p *Parser) parseIfExpression() ast.Expression {
         return nil
     }
 
-    p.nextToken()
-
     // { to start the logic after the if statement
     if !p.expectPeek(token.LBRACE) {
         return nil
