@@ -189,6 +189,8 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
         return nil
     }
 
+    p.nextToken()
+
     stmt.Value = p.parseExpression(LOWEST)
 
     for !p.curTokenIs(token.SEMICOLON) {
@@ -251,11 +253,14 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 
 // this function is the heart of the Pratt parser
 func (p *Parser) parseExpression(precedence int) ast.Expression {
+
     prefix := p.prefixParseFns[p.curToken.Type]
+
     if prefix == nil {
         p.noPrefixParseFnError(p.curToken.Type)
         return nil
     }
+
     leftExp := prefix()
 
     // as long as the next token is not a semicolon and the next tokens precedence is not greater
