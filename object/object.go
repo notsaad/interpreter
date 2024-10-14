@@ -9,6 +9,7 @@ type ObjectType string
 const (
     INTEGER_OBJ = "INTEGER"
     BOOLEAN_OBJ = "BOOLEAN"
+    NULL_OBJ    = "NULL"
 )
 
 // every value in the source code will be represented as an object for simplicity
@@ -43,4 +44,8 @@ func (b *Boolean) Inspect() string {
     return fmt.Sprintf("%t", b.Value)
 }
 
+type Null struct{}
 
+func (n *Null) Type() ObjectType { return NULL_OBJ }
+
+func (n *Null) Inspect() string { return "null" }
