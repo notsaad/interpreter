@@ -1,8 +1,8 @@
+package object
+
 import (
     "fmt"
 )
-
-package object
 
 type ObjectType string
 
