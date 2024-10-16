@@ -13,9 +13,12 @@ func Eval(node ast.Node) object.Object {
         return evalStatements(node.Statements)
     case *ast.ExpressionStatement:
         return Eval(node.Expression) // recursive evaluation call
-        // expressions
+
+    // expressions
     case *ast.IntegerLiteral:
         return &object.Integer{Value: node.Value}
+    case *ast.Boolean:
+        return &object.Boolean{Value: node.Value}
 
     }
     return nil
