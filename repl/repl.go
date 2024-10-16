@@ -6,6 +6,7 @@ import (
     "io"
     "skibidi/lexer"
     "skibidi/parser"
+    "skibidi/evaluator"
 )
 
 const SKIBIDI_ASCII = `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠄⠒⠒⠀⠀⠒⠂⠠⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -64,7 +65,6 @@ func Start(in io.Reader, out io.Writer) {
         line := scanner.Text()
         // send each line to the lexer to get broken down to Tokens
         l := lexer.New(line)
-
         p := parser.New(l)
 
         program := p.ParseProgram()
@@ -73,8 +73,12 @@ func Start(in io.Reader, out io.Writer) {
             continue
         }
 
-        io.WriteString(out, program.String())
-        io.WriteString(out, "\n")
+        evaluated := evaluator.Eval(program)
+
+        if evaluated != nil {
+            io.WriteString(out, evaluated.Inspect())
+            io.WriteString(out, "\n")
+        }
     }
 }
 
