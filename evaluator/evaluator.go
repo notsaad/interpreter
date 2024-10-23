@@ -41,6 +41,18 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
         env.Set(node.Name.Value, val)
 
     // expressions
+    case *ast.CallExpression:
+        function := Eval(node.Function, env)
+        if isError(function) {
+            return function
+        }
+        // the arguments are 'simplified' by being evaluated individually before being evaluated in the function
+        // for example, if the call is "add(2 + 2, 3 + 3);" then we want the actual function call to be "add(4, 6);"
+        args := evalExpressions(node.Arguments, env)
+        if len(args) == 1 && isError(args[0]) {
+            return args[0]
+        }
+        return applyFunction(function, args)
     case *ast.IntegerLiteral:
         return &object.Integer{Value: node.Value}
     case *ast.Boolean:
@@ -239,5 +251,47 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
         return newError("identifier not found: " + node.Value)
     }
     return val
+}
+
+func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
+    // iterate over a list of ast.Expressions and evaluate them in the context of the current environment
+    var result []object.Object
+
+    for _, e := range exps {
+        evaluated := Eval(e, env)
+        if isError(evaluated) {
+            return []object.Object{evaluated}
+        }
+        result = append(result, evaluated)
+    }
+    return result
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+    function, ok := fn.(*object.Function)
+    if !ok {
+        return newError("not a function: %s", fn.Type())
+    }
+
+    extendedEnv := extendFunctionEnv(function, args)
+    evaluated := Eval(function.Body, extendedEnv)
+    return unwrapReturnValue(evaluated)
+}
+
+func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
+    env := object.NewEnclosedEnvironment(fn.Env)
+
+    for paramIdx, param := range fn.Parameters {
+        env.Set(param.Value, args[paramIdx])
+    }
+
+    return env
+}
+
+func unwrapReturnValue(obj object.Object) object.Object {
+    if returnValue, ok := obj.(*object.ReturnValue); ok {
+        return returnValue.Value
+    }
+    return obj
 }
 
