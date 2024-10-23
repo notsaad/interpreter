@@ -255,3 +255,28 @@ func TestLetStatements(t *testing.T) {
     }
 }
 
+// pretty hard coded function evaluation test
+func TestFunctionObject(t *testing.T) {
+    input := "fn(x) { x + 2; };"
+
+    evaluated := testEval(input)
+    fn, ok := evaluated.(*object.Function)
+    if !ok {
+        t.Fatalf("Expected object to be a function, got: %T (%+v)", evaluated, evaluated)
+    }
+
+    if len(fn.Parameters) != 1 {
+        t.Fatalf("Function has wrong parameters: %+v", fn.Parameters)
+    }
+
+    if fn.Parameters[0].String() != "x" {
+        t.Fatalf("Expected parameter to be x, got: %q", fn.Parameters[0])
+    }
+
+    expectedBody := "(x + 2)"
+
+    if fn.Body.String() != expectedBody {
+        t.Fatalf("Function body should be: %q, got: %q", expectedBody, fn.Body.String())
+    }
+}
+

@@ -7,6 +7,7 @@ import (
     "skibidi/lexer"
     "skibidi/parser"
     "skibidi/evaluator"
+    "skibidi/object"
 )
 
 const SKIBIDI_ASCII = `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠄⠒⠒⠀⠀⠒⠂⠠⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
