@@ -37,11 +37,13 @@ func TestEvalIntegerExpression(t *testing.T) {
 }
 
 func testEval(input string) object.Object {
+    // we define all new everything on every differnt call to testEval because we don't want bugs to persist between calls (for example bugs in the environment to persist)
     l := lexer.New(input)
     p := parser.New(l)
     program := p.ParseProgram()
+    env := object.NewEnvironment()
 
-    return Eval(program)
+    return Eval(program, env)
 }
 
 func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
@@ -249,7 +251,7 @@ func TestLetStatements(t *testing.T) {
     }
 
     for _, tt := range tests {
-        testIntegerObject(t, evaluated, tt.expected)
+        testIntegerObject(t, testEval(tt.input), tt.expected)
     }
 }
 
