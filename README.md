@@ -15,4 +15,4 @@ Example of the interpreter running in a REPL from the terminal.
 
 # Notes:
 - No garbage collection (Go's GC is used)
-- No formal support for printing, strings, and many other things (for now...)
+- No formal support for printing, strings, and other things (for now...)
